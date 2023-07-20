@@ -11,32 +11,32 @@ import spring.mvc.redis.streams.RedisStreamConsumer
 import java.time.Duration
 import java.util.*
 
-//@Component
-//class SampleFormaterConsumer @Autowired constructor(
-//    redis: RedisTemplate<String, String>,
-//    @Value("\${redis.stream.request_formater_key}") streamKey: String,
-//    @Value("\${redis.groups.format}") groupId: String,
-//    @Autowired val formaterService: FormaterService
-//) : RedisStreamConsumer<FormatRequestEvent>(streamKey, groupId, redis) {
-//
-//    init {
-//        subscription()
-//    }
-//
-//    override fun onMessage(record: ObjectRecord<String, FormatRequestEvent>) {
-//        val (snippetId, formatRulesId, token) = record.value
-//        val snippetDTO = formaterService.getSnippetContent(token, snippetId)
-//        val formatResult = formaterService.format(snippetDTO.content)
-//        formaterService.updateSnippetContent(token, snippetId, snippetDTO, formatResult)
-//    }
-//
-//    override fun options(): StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, FormatRequestEvent>> {
-//        return StreamReceiver.StreamReceiverOptions.builder()
-//            .pollTimeout(Duration.ofMillis(10000)) // Set poll rate
-//            .targetType(FormatRequestEvent::class.java) // Set type to de-serialize record
-//            .build()
-//    }
-//}
+@Component
+class SampleFormaterConsumer @Autowired constructor(
+    redis: RedisTemplate<String, String>,
+    @Value("\${redis.stream.request_key}") streamKey: String,
+    @Value("\${redis.groups.format}") groupId: String,
+    @Autowired val formaterService: FormaterService
+) : RedisStreamConsumer<FormatRequestEvent>(streamKey, groupId, redis) {
+
+    init {
+        subscription()
+    }
+
+    override fun onMessage(record: ObjectRecord<String, FormatRequestEvent>) {
+        val (snippetId, formatRulesId, token) = record.value
+        val snippetDTO = formaterService.getSnippetContent(token, snippetId)
+        val formatResult = formaterService.format(snippetDTO.content)
+        formaterService.updateSnippetContent(token, snippetId, snippetDTO, formatResult)
+    }
+
+    override fun options(): StreamReceiver.StreamReceiverOptions<String, ObjectRecord<String, FormatRequestEvent>> {
+        return StreamReceiver.StreamReceiverOptions.builder()
+            .pollTimeout(Duration.ofMillis(10000)) // Set poll rate
+            .targetType(FormatRequestEvent::class.java) // Set type to de-serialize record
+            .build()
+    }
+}
 
 data class FormatRequestEvent(
     val snippetId: UUID,
