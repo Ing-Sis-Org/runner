@@ -31,6 +31,7 @@ class SampleLinterConsumer @Autowired constructor(
         this.linterService = linterService
     }
 
+
     init {
         subscription()
     }
